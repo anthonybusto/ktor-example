@@ -1,16 +1,16 @@
 package com.example.routes
 
 import com.example.extensions.*
-import com.example.model.User
+import com.example.model.Like
 import com.example.model.response.toResponseList
 import com.example.model.response.toResponseObject
-import com.example.service.UserService
+import com.example.service.LikeService
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.util.pipeline.*
 
-object UserRouter {
+object LikeRouter {
 
 
     //To get path parameter: this.parameter["key"]
@@ -20,7 +20,7 @@ object UserRouter {
         with(call) {
             executeSafely(successCodeOverride = HttpStatusCode.NoContent) {
                 val id = getLongParam("id") ?: throw Exception("Parameter id doesn't exist!")
-                UserService.delete(id)
+                LikeService.delete(id)
             }
         }
     }
@@ -28,7 +28,7 @@ object UserRouter {
     fun deleteAll(): PipelineInterceptor<Unit, ApplicationCall> = {
         with(call) {
             executeSafely(successCodeOverride = HttpStatusCode.NoContent) {
-                UserService.deleteAll()
+                LikeService.deleteAll()
             }
         }
     }
@@ -37,7 +37,7 @@ object UserRouter {
     fun insert(): PipelineInterceptor<Unit, ApplicationCall> = {
         with(call) {
             executeSafely {
-                UserService.insert(receive())
+                LikeService.insert(receive())
             }
         }
     }
@@ -46,7 +46,7 @@ object UserRouter {
         with(call) {
             executeSafely {
                 with(request) {
-                    UserService.all(
+                    LikeService.all(
                         page = pageParameter(),
                         pageSize = pageSizeParameter(),
                         sortOrder = sortOrderParameter()
@@ -64,7 +64,7 @@ object UserRouter {
                 val id = getLongParam("id") ?: throw Exception("Parameter id doesn't exist!")
                 //To get path parameter: this.parameter["key"]
                 //To get query parameter this.request.queryParameters["key"]
-                UserService.find(id).toResponseObject()
+                LikeService.find(id).toResponseObject()
             }
         }
 
@@ -74,16 +74,11 @@ object UserRouter {
     fun update(): PipelineInterceptor<Unit, ApplicationCall> = {
         with(call) {
             executeSafely {
-                val user = receive<User>()
-                UserService.update(user.id) {
-                    this.userName = user.userName
-                    this.firstName = user.firstName
-                    this.lastName = user.lastName
-                    this.city = user.city
-                    this.age = user.age
-                    this.avatar = user.avatar
-                    this.banner = user.banner
-
+                val like = receive<Like>()
+                LikeService.update(like.id) {
+                    this.userName = like.userName
+                    this.userId = like.userId
+                    this.count = like.count
                 }
 
             }
