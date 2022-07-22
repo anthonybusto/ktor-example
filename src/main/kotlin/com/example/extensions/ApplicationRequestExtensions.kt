@@ -16,7 +16,7 @@ fun ApplicationRequest.sortOrderParameter(): SortOrder = this.queryParameters.so
 
 fun Parameters.page(): Int? = this["page"]?.toInt()
 
-fun ApplicationRequest.pageParameter(): Int? = this.queryParameters.page()
+fun ApplicationRequest.pageParameter(): Int = this.queryParameters.page() ?: 1
 
 fun Parameters.pageSize(): Int = this["pageSize"]?.toInt() ?: PAGE_SIZE
 

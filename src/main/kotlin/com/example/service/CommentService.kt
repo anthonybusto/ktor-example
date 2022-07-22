@@ -1,24 +1,23 @@
 package com.example.service
 
-import com.example.domain.dao.UsersDao
-import com.example.domain.dao.toUser
+import com.example.domain.dao.CommentDao
+import com.example.domain.dao.toComment
 import com.example.error.EntityNotFoundException
 import com.example.extensions.any
 import com.example.extensions.paginate
-import com.example.model.User
-import com.example.model.request.UserBody
+import com.example.model.Comment
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 
 private const val PAGE_SIZE = 20
 
-object UserService {
+object CommentService {
 
-    private val dao get() = UsersDao
-    private val mapper: (entity: UsersDao) -> User = { it.toUser() }
+    private val dao get() = CommentDao
+    private val mapper: (entity: CommentDao) -> Comment = { it.toComment() }
 
-    fun all(): List<User> = transaction {
+    fun all(): List<Comment> = transaction {
         dao.all().map(mapper)
     }
 
@@ -26,7 +25,7 @@ object UserService {
         page: Int? = null,
         pageSize: Int = PAGE_SIZE,
         orderBy: Pair<Expression<*>, SortOrder> = dao.table.id to SortOrder.ASC
-    ): List<User> = transaction {
+    ): List<Comment> = transaction {
         dao.all()
             .let { data -> page?.let { data.paginate(page, pageSize) } ?: data }
             .orderBy(orderBy)
@@ -37,7 +36,7 @@ object UserService {
         page: Int? = null,
         pageSize: Int = PAGE_SIZE,
         sortOrder: SortOrder = SortOrder.ASC
-    ): List<User> = transaction {
+    ): List<Comment> = transaction {
         all(page, pageSize, dao.table.id to sortOrder)
     }
 
@@ -45,18 +44,18 @@ object UserService {
         return@transaction dao.any()
     }
 
-    fun any(predicate: (UsersDao) -> Boolean): Boolean = transaction {
+    fun any(predicate: (CommentDao) -> Boolean): Boolean = transaction {
         return@transaction dao.any(predicate)
     }
 
     fun delete(id: Long) = transaction {
-        val user = dao.findById(id) ?: throw EntityNotFoundException()
-        user.delete()
+        val comment = dao.findById(id) ?: throw EntityNotFoundException()
+        comment.delete()
     }
 
     fun deleteAll() = transaction { dao.table.deleteAll() }
 
-    fun find(id: Long): User = transaction {
+    fun find(id: Long): Comment = transaction {
 //        dao.find {
 //            //UserTable.age.eq(1)
 //           // UserTable.age.eq(1).and(UserTable.userName.eq("Aaaa"))
@@ -69,7 +68,7 @@ object UserService {
     fun find(
         limit: Int,
         order: Pair<Expression<*>, SortOrder>,
-    ): User = transaction {
+    ): Comment = transaction {
         dao.all()
             .orderBy(order)
             .limit(limit)
@@ -82,19 +81,19 @@ object UserService {
     fun find(
         orderBy: Pair<Expression<*>, SortOrder>,
         op: SqlExpressionBuilder.() -> Op<Boolean>
-    ): List<User> = transaction {
+    ): List<Comment> = transaction {
 
         dao.find(op)
             .orderBy(orderBy)
             .map(mapper)
     }
 
-    fun find(op: SqlExpressionBuilder.() -> Op<Boolean>): List<User> = transaction {
+    fun find(op: SqlExpressionBuilder.() -> Op<Boolean>): List<Comment> = transaction {
         dao.find(op).map(mapper)
     }
 
 
-    fun first(ex: Expression<*>): User = transaction {
+    fun first(ex: Expression<*>): Comment = transaction {
         find(
             limit = 1,
             order = ex to SortOrder.ASC
@@ -104,22 +103,22 @@ object UserService {
     fun firstLimit(
         limit: Int,
         ex: Expression<*>
-    ): User = transaction {
+    ): Comment = transaction {
         find(
             limit = limit,
             order = ex to SortOrder.ASC
         )
     }
 
-    fun insert(model: UserBody): User = transaction {
+    fun insert(model: Comment): Comment = transaction {
         return@transaction dao.insert(model)
     }
 
-    fun insertAll(list: List<UserBody>): List<User> = transaction {
+    fun insertAll(list: List<Comment>): List<Comment> = transaction {
         return@transaction dao.insertAll(list)
     }
 
-    fun last(ex: Expression<*>): User? = transaction {
+    fun last(ex: Expression<*>): Comment? = transaction {
         find(
             limit = 1,
             order = ex to SortOrder.DESC
@@ -129,7 +128,7 @@ object UserService {
     fun lastLimit(
         limit: Int,
         orderByColumn: Expression<*>
-    ): List<User> = transaction {
+    ): List<Comment> = transaction {
         dao.all()
             .orderBy(orderByColumn to SortOrder.DESC)
             .limit(limit)
@@ -138,7 +137,7 @@ object UserService {
     }
 
 
-    fun update(id: Long, block: UsersDao.() -> Unit): User = transaction {
+    fun update(id: Long, block: CommentDao.() -> Unit): Comment = transaction {
         return@transaction dao.findById(id)
             ?.apply(block)
             ?.let(mapper)

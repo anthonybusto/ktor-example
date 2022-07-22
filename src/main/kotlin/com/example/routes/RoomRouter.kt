@@ -1,16 +1,17 @@
 package com.example.routes
 
 import com.example.extensions.*
-import com.example.model.User
+import com.example.model.Room
+
 import com.example.model.response.toResponseList
 import com.example.model.response.toResponseObject
-import com.example.service.UserService
+import com.example.service.RoomService
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.util.pipeline.*
 
-object UserRouter {
+object RoomRouter {
 
 
     //To get path parameter: this.parameter["key"]
@@ -20,7 +21,7 @@ object UserRouter {
         with(call) {
             executeSafely(successCodeOverride = HttpStatusCode.NoContent) {
                 val id = getLongParam("id") ?: throw Exception("Parameter id doesn't exist!")
-                UserService.delete(id)
+                RoomService.delete(id)
             }
         }
     }
@@ -28,7 +29,7 @@ object UserRouter {
     fun deleteAll(): PipelineInterceptor<Unit, ApplicationCall> = {
         with(call) {
             executeSafely(successCodeOverride = HttpStatusCode.NoContent) {
-                UserService.deleteAll()
+                RoomService.deleteAll()
             }
         }
     }
@@ -37,7 +38,7 @@ object UserRouter {
     fun insert(): PipelineInterceptor<Unit, ApplicationCall> = {
         with(call) {
             executeSafely {
-                UserService.insert(receive())
+                RoomService.insert(receive())
             }
         }
     }
@@ -46,7 +47,7 @@ object UserRouter {
         with(call) {
             executeSafely {
                 with(request) {
-                    UserService.all(
+                    RoomService.all(
                         page = pageParameter(),
                         pageSize = pageSizeParameter(),
                         sortOrder = sortOrderParameter()
@@ -64,7 +65,7 @@ object UserRouter {
                 val id = getLongParam("id") ?: throw Exception("Parameter id doesn't exist!")
                 //To get path parameter: this.parameter["key"]
                 //To get query parameter this.request.queryParameters["key"]
-                UserService.find(id).toResponseObject()
+                RoomService.find(id).toResponseObject()
             }
         }
 
@@ -74,19 +75,16 @@ object UserRouter {
     fun update(): PipelineInterceptor<Unit, ApplicationCall> = {
         with(call) {
             executeSafely {
-                val user = receive<User>()
-                UserService.update(user.id) {
-                    this.userName = user.userName
-                    this.firstName = user.firstName
-                    this.lastName = user.lastName
-                    this.city = user.city
-                    this.age = user.age
-                    this.avatar = user.avatar
-                    this.banner = user.banner
-
+                val room = receive<Room>()
+                RoomService.update(room.id) {
+//                    this.userName = room.createdByUserName
+                    this.channelName = room.channelName
+//                    this.userId = room.createdByUserId
+                    this.uid = room.uid
                 }
 
             }
         }
     }
+
 }

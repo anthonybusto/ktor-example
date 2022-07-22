@@ -1,16 +1,17 @@
 package com.example.routes
 
 import com.example.extensions.*
-import com.example.model.User
+import com.example.model.Clip
+import com.example.model.request.ClipBody
 import com.example.model.response.toResponseList
 import com.example.model.response.toResponseObject
-import com.example.service.UserService
+import com.example.service.ClipService
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.util.pipeline.*
 
-object UserRouter {
+object ClipRouter {
 
 
     //To get path parameter: this.parameter["key"]
@@ -20,7 +21,7 @@ object UserRouter {
         with(call) {
             executeSafely(successCodeOverride = HttpStatusCode.NoContent) {
                 val id = getLongParam("id") ?: throw Exception("Parameter id doesn't exist!")
-                UserService.delete(id)
+                ClipService.delete(id)
             }
         }
     }
@@ -28,7 +29,7 @@ object UserRouter {
     fun deleteAll(): PipelineInterceptor<Unit, ApplicationCall> = {
         with(call) {
             executeSafely(successCodeOverride = HttpStatusCode.NoContent) {
-                UserService.deleteAll()
+                ClipService.deleteAll()
             }
         }
     }
@@ -37,7 +38,7 @@ object UserRouter {
     fun insert(): PipelineInterceptor<Unit, ApplicationCall> = {
         with(call) {
             executeSafely {
-                UserService.insert(receive())
+                ClipService.insert(receive())
             }
         }
     }
@@ -46,7 +47,7 @@ object UserRouter {
         with(call) {
             executeSafely {
                 with(request) {
-                    UserService.all(
+                    ClipService.all(
                         page = pageParameter(),
                         pageSize = pageSizeParameter(),
                         sortOrder = sortOrderParameter()
@@ -64,7 +65,7 @@ object UserRouter {
                 val id = getLongParam("id") ?: throw Exception("Parameter id doesn't exist!")
                 //To get path parameter: this.parameter["key"]
                 //To get query parameter this.request.queryParameters["key"]
-                UserService.find(id).toResponseObject()
+                ClipService.find(id).toResponseObject()
             }
         }
 
@@ -74,16 +75,18 @@ object UserRouter {
     fun update(): PipelineInterceptor<Unit, ApplicationCall> = {
         with(call) {
             executeSafely {
-                val user = receive<User>()
-                UserService.update(user.id) {
-                    this.userName = user.userName
-                    this.firstName = user.firstName
-                    this.lastName = user.lastName
-                    this.city = user.city
-                    this.age = user.age
-                    this.avatar = user.avatar
-                    this.banner = user.banner
+                val clip = receive<ClipBody>()
 
+
+                ClipService.update(
+                    clip.id
+                        ?: throw Exception("Clip body parameter cannot have a nullable id value pass over!")
+                ) {
+//                    this.userName = clip.userName
+                    this.url = clip.url
+                    this.likes = clip.likes
+                    this.comments = clip.comments
+                    this.description = clip.description
                 }
 
             }

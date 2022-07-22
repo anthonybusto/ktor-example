@@ -1,16 +1,12 @@
-package com.example.model
+package com.example.model.request
 
 @kotlinx.serialization.Serializable
-data class User(
-    val id: Long,
+data class UserBody(
     val userName: String,
     val firstName: String?,
     val lastName: String?,
     val city: String,
     val age: Int,
-    val avatar:String?,
-    val banner:String?
+    val avatar:String? = null,
+    val banner:String? = null
 )
-
-
-
